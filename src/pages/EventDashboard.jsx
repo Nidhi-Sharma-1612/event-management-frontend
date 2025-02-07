@@ -9,6 +9,7 @@ import ConfirmDeleteModal from "../components/ConfirmDeleteModal";
 import { Button } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import useWebSocket from "../hooks/useWebSocket";
+import useLeaveEventOnUnload from "../hooks/useLeaveEventOnUnload";
 
 const EventDashboard = () => {
   const {
@@ -35,6 +36,8 @@ const EventDashboard = () => {
   // ✅ Check if user is a guest
   const user = JSON.parse(localStorage.getItem("user"));
   const isGuest = user?.role === "guest";
+
+  useLeaveEventOnUnload(isGuest, joinedEventId, setJoinedEventId);
 
   const handleCreateEvent = async (newEvent) => {
     try {
@@ -151,34 +154,6 @@ const EventDashboard = () => {
       alert("Failed to delete event. Please try again.");
     }
   };
-
-  useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      if (isGuest && joinedEventId) {
-        console.log(
-          "📤 Guest is leaving event before closing window:",
-          joinedEventId
-        );
-
-        // Remove joinedEventId from localStorage
-        localStorage.removeItem("joinedEventId");
-
-        // Send a synchronous request to leave the event
-        navigator.sendBeacon(
-          `http://localhost:5000/api/events/leave/${joinedEventId}`
-        );
-
-        // Reset state (this will update UI on next mount)
-        setJoinedEventId(null);
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
-  }, [isGuest, joinedEventId]);
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-8">
