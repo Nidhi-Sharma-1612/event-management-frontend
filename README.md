@@ -99,7 +99,3 @@ The Event Management Frontend is a web application that allows users to create, 
 
 5. **Access the app in the browser:**
    - Open [http://localhost:5173](http://localhost:5173)
-
-```
-
-```
